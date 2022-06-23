@@ -14,16 +14,17 @@ class Cliente{
 
 const clienteDB = {};
 
-//el resolver
-const resolvers = {
+export const resolvers = {
+    Query:{
         getCliente:({id})=>{
             return new Cliente(id,clienteDB[id]);
         },
+    },
+    Mutation:{
         crearCliente: ({input}) =>{
             const id = require('crypto').randomBytes(10).toString('hex');
             clienteDB[id] = input;
             return new Cliente(id,input);
         }
-};
-
-export default resolvers;
+    }
+}
