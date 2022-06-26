@@ -1,18 +1,6 @@
-class Cliente{
-    constructor(id,{nombre,apellido,empresa,email,edad,tipo,pedidos,emails}){
-        this.id = id;
-        this.nombre = nombre;
-        this.apellido = apellido;
-        this.empresa = empresa;
-        this.email = email;
-        this.edad = edad;
-        this.tipo = tipo;
-        this.pedidos = pedidos;
-        this.emails = emails;
-    }
-}
+import mongoose from "mongoose";
+import {Clientes} from "./db"
 
-const clienteDB = {};
 
 export const resolvers = {
     Query:{
@@ -21,10 +9,31 @@ export const resolvers = {
         },
     },
     Mutation:{
-        crearCliente: ({input}) =>{
-            const id = require('crypto').randomBytes(10).toString('hex');
-            clienteDB[id] = input;
-            return new Cliente(id,input);
+        crearCliente: (root,{input}) =>{
+            const nuevoCliente = new Clientes({
+                nombre : input.nombre,
+                apellido : input.apellido,
+                empresa : input.empresa,
+                emails : input.emails,
+                edad : input.edad,
+                tipo : input.tipo,
+                pedidos : input.pedidos
+            });
+            nuevoCliente.id = nuevoCliente._id;
+            return new Promise((resolve,object) => {
+                nuevoCliente.save((error) => {
+                    if(error) rejects(error)
+                    else resolve(nuevoCliente)
+                });
+            });
+        },
+        actualizarCliente: (root,{input}) => {
+            return new Promise((resolve,objetc) =>{
+                Clientes.findOneAndUpdate({_id : input.id},input,{new:true},(error,cliente)=>{
+                    if(error) rejects(error)
+                    else resolve(cliente)
+                });
+            });
         }
     }
 }
